@@ -1,0 +1,219 @@
+#include <iostream>
+#include <vector>
+
+
+
+using namespace std;
+
+class base { //класс базы, где использованы основные переменные имени, фармакологической группы, цены, отпуска по рецепту и количества товара на складе
+public:
+	string name;
+	string farmgroup;
+	int price;
+	bool receipt;
+	int count;
+	base(string name, string farmgroup, int price, bool receipt, int count) {
+		this->name = name;
+		this->farmgroup = farmgroup;
+		this->price = price;
+		this->receipt = receipt;
+		this->count = count;
+	}
+	virtual void show() {}
+	void changecount(int newcount) {
+		this->count += newcount;
+	}
+};
+
+class tablet : public base { //класс таблетки, исользующий класс базы
+private:
+	int tablets_count; //количество таблеток в упаковке
+public:
+	tablet(string name, string farmgroup, int price, bool receipt, int count, int tablets_count) : base(name, farmgroup, price, receipt, count) {
+		this->tablets_count = tablets_count;
+	}
+	void show() {
+		cout << name << " " << farmgroup << " " << price << " " << receipt << " " << count << " " << tablets_count << endl;
+	}	
+};
+
+class kapli : public base { //класс капли, использующий класс базы
+private:
+	int ml; //объем жидкости в пузырьке 
+public:
+	kapli(string name, string farmgroup, int price, bool receipt, int count, int ml) : base(name, farmgroup, price, receipt, count) {
+		this->ml = ml;
+	}
+	void show() {
+		cout << name << " " << farmgroup << " " << price << " " << receipt << " " << count << " " << ml << endl;
+	}
+};
+class maz : public base { //класс мазь, использующий класс базы
+private:
+	int gr; //вес мази
+public:
+
+	maz(string name, string farmgroup, int price, bool receipt, int count, int gr) : base(name, farmgroup, price, receipt, count) {
+		this->gr = gr;
+	}
+	void show() {
+		cout << name << " " << farmgroup << " " << price << " " << receipt << " " << count << " " << gr << endl;
+	}
+};
+
+int main() {
+
+	system("chcp 1251");
+	//добавление стартовых элементов 
+	vector <base*> lekarstva;
+	lekarstva.push_back(new tablet("Анальгин", "анальгектик", 56, false, 12, 20));
+	lekarstva.push_back(new tablet("Цитрамон", "анальгетик", 55, false, 14, 20));
+	lekarstva.push_back(new tablet("Супрастин", "антигистаминное", 108, false, 53, 20));
+	lekarstva.push_back(new tablet("Арбидол", "противовирусное", 223, false, 32, 10));
+	lekarstva.push_back(new tablet("Амоксицилин", "антибиотик", 60, true, 9, 16));
+
+	lekarstva.push_back(new kapli("Тизин", "антиконгестант", 88, false, 50, 10));
+	lekarstva.push_back(new kapli("Ринонорм", "антиконгестант", 91, false, 10, 20));
+	lekarstva.push_back(new kapli("Назонекс", "антигистаминное", 1013, true, 15, 12));
+	lekarstva.push_back(new kapli("Изофра", "антибиотик", 332, false, 12, 15));
+
+	lekarstva.push_back(new maz("Афлодерм", "дерматотропное", 323, false, 9, 20));
+	lekarstva.push_back(new maz("Псориатен", "дерматотропное", 630, false, 6, 50));
+	lekarstva.push_back(new maz("Вазелин", "дерматотропное", 15, false, 23, 30));
+
+	
+	char repeat = 'y';
+	int oper;//номер ф-ции
+	string group; //фармакологическая группа для вывода препаратов
+	string nazvanie; //переменная для поиска препарата
+	int nazvindex; //индекс препарата, который мы искали
+	int indexmax = 0; //индекс максимального по цене препарата 
+	int indexmin = 0; //индекс минимального по цене препарата
+	char chkol;
+	int newkol;//количество упаковок препарата
+	//переменные для добавления нового препарата на склад
+	int type; //тип товара, добавляемого на склад
+	string newname; //имя нового товара
+	string newfarmgroup; //фарм. группа нового товара
+	int newprice; //цена нового товара
+	bool newreceipt; // отпуск по рецепту нового товара
+	int newcount; //количество препаратов, поступаемое на склад
+	int newdop; //переменная для отличитльной переменной  всех препаратов(количество таблеток/объем/вес)
+	bool find = false;
+	bool find1 = false;
+	while (repeat == 'y') {
+		cout << "Введите номер операции, которую хотите выполнить" << endl;
+		cout << "1 - Вывод всех товаров" << endl;
+		cout << "2 - поиск товара по названию" << endl;
+		cout << "3 - показать самый дорогой препарат" << endl;
+		cout << "4 - показать самый дешёвый препарат" << endl;
+		cout << "5 - вывод товаров определенной фармакологической группы" << endl;
+		cout << "6 - добавить новый товар на склад" << endl;
+		cin >> oper;
+		switch (oper)
+		{
+		case 1: //вывод всех товаров
+			for (int i = 0; i < lekarstva.size(); i++) {
+				lekarstva[i]->show();
+			}
+			break;
+			case 2: //поиск препарата по названию
+				cout << "Введите название препарата:" << endl;
+				cin >> nazvanie;
+				for (int i = 0; i < lekarstva.size(); i++) {
+
+					if (lekarstva[i]->name == nazvanie) {
+						nazvindex = i;
+						lekarstva[i]->show();
+						find = true;
+						cout << "Хотите ли вы изменить количество товара на складе?(y/n)" << endl;
+						cin >> chkol;
+						if (chkol == 'y' or chkol == 'Y') {
+							cout << "Введите количество товара, которое вы хотите взять или добавить" << endl;
+							cin >> newkol;
+							lekarstva[nazvindex]->changecount(newkol);
+						}
+					}
+				}
+				if (find == false) {
+					cout << "Введенного препарата нет на складе" << endl;
+				}
+				break;
+			case 3: //поиск максимального по цене товара
+				for (int i = 0; i < lekarstva.size(); i++) {
+                if (lekarstva[i]->price > lekarstva[indexmax]->price) {
+					indexmax = i;
+                }
+            }
+            lekarstva[indexmax]->show();
+				break;
+			case 4: //поиск минимального по цене товара
+				for (int i = 0; i < lekarstva.size(); i++) { //поиск самого дешёвого лекарства
+                if (lekarstva[i]->price < lekarstva[indexmin]->price) {
+					indexmin = i;
+                }
+            }
+            lekarstva[indexmin]->show();
+				break;
+			case 5: //вывод определенной группы
+				cout << "Введите название фармакологической группы, которую хотите вывести" << endl;
+				cin >> group;
+				for (int i = 0; i < lekarstva.size(); i++) {
+					if (lekarstva[i]->farmgroup == group) {
+						lekarstva[i]->show();
+						find1 = true;
+					}
+				}
+				if (find1 == false) {
+					cout << "Введенной фармакологической группы не существует" << endl;
+				}
+				break;
+			case 6:
+				cout << "Введите номер группы, к которой относится новый препарат" << endl;
+				cout << "1 - таблетки" << endl;
+				cout << "2 - капли" << endl;
+				cout << "3 - мазь" << endl;
+				cin >> type;
+				if (type == 1 or type == 2 or type == 3) {
+					cout << "введите название препарата" << endl;
+					cin >> newname;
+					cout << "введите фармакологическую группу" << endl;;
+					cin >> newfarmgroup;
+					cout << "введите цену" << endl;;
+					cin >> newprice;
+					cout << "условия отпуска. 1 - по рецепту, 0 - без рецепта" << endl;;
+					cin >> newreceipt;
+					cout << "введите количество препаратов, поступающих на склад" << endl;;
+					cin >> newcount;
+					switch (type) {
+					case 1:
+						cout << "Введите количество таблеток в упаковке" << endl;
+						cin >> newdop;
+						lekarstva.push_back(new tablet(newname, newfarmgroup, newprice, newreceipt, newcount, newdop));
+						break;
+					case 2:
+						cout << "введите объем жидкости" << endl;
+						cin >> newdop;
+						lekarstva.push_back(new kapli(newname, newfarmgroup, newprice, newreceipt, newcount, newdop));
+						break;
+					case 3:
+						cout << "Введите вес мази" << endl;
+						cin >> newdop;
+						lekarstva.push_back(new maz(newname, newfarmgroup, newprice, newreceipt, newcount, newdop));
+						break;
+					}
+				}
+				else {
+					cout << "Введенной группы не существует" << endl;
+				}
+				break;
+				
+			default:
+				cout << "Введеной функции не существует" << endl;
+				break;
+			}
+			cout << "Хотите продолжить работу? (y/n)" << endl;
+			cin >> repeat;
+		}
+	return 0;
+}
